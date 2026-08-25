@@ -1,26 +1,336 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Palette ───────────────────────────────────────────────────
+   Dark is the default. Light is defined twice: once for the
+   system preference (when the user hasn't chosen), once for an
+   explicit [data-theme="light"] so the toggle always wins.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-bg: #08080b;
+  --color-panel: #0e0e13;
+  --color-card: #141419;
+  --color-card-2: #1a1a22;
+  --color-line: #23232e;
+  --color-line-2: #32323f;
+
+  --color-fg: #f2f2f6;
+  --color-muted: #a2a2b2;
+  --color-faint: #6f6f80;
+
+  --color-accent: #a78bfa;
+  --color-accent-2: #22d3ee;
+  --color-success: #34d399;
+  --color-warn: #fbbf24;
+
+  --color-stripe: rgba(255, 255, 255, 0.04);
+  --color-grid: rgba(255, 255, 255, 0.035);
+  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 60px -30px rgba(0, 0, 0, 0.9);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Shared light-mode values, applied by both selectors below. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --color-bg: #eeeef2;
+    --color-panel: #ffffff;
+    --color-card: #ffffff;
+    --color-card-2: #f5f5f8;
+    --color-line: #e3e3ea;
+    --color-line-2: #cfcfda;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-fg: #15151b;
+    --color-muted: #55555f;
+    --color-faint: #86868f;
+
+    --color-accent: #7c3aed;
+    --color-accent-2: #0891b2;
+    --color-success: #059669;
+    --color-warn: #b45309;
+
+    --color-stripe: rgba(0, 0, 0, 0.045);
+    --color-grid: rgba(0, 0, 0, 0.045);
+    --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 20px 50px -30px rgba(0, 0, 0, 0.35);
   }
 }
 
+:root[data-theme="light"] {
+  --color-bg: #eeeef2;
+  --color-panel: #ffffff;
+  --color-card: #ffffff;
+  --color-card-2: #f5f5f8;
+  --color-line: #e3e3ea;
+  --color-line-2: #cfcfda;
+
+  --color-fg: #15151b;
+  --color-muted: #55555f;
+  --color-faint: #86868f;
+
+  --color-accent: #7c3aed;
+  --color-accent-2: #0891b2;
+  --color-success: #059669;
+  --color-warn: #b45309;
+
+  --color-stripe: rgba(0, 0, 0, 0.045);
+  --color-grid: rgba(0, 0, 0, 0.045);
+  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 20px 50px -30px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Base ──────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+  background-color: var(--color-bg);
+  color-scheme: dark;
+}
+:root[data-theme="light"],
+:root:not([data-theme="dark"]) {
+  color-scheme: light dark;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* Room for the floating dock. */
+  padding-bottom: 5.5rem;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-2) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-line-2);
+  border-radius: 999px;
+  border: 3px solid var(--color-bg);
+}
+
+/* ── Surfaces ──────────────────────────────────────────────────── */
+
+/* Outer rounded container that everything nests inside. */
+.panel {
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-panel);
+}
+
+.card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-line);
+  transition: border-color 260ms ease, background-color 260ms ease,
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease;
+}
+.card:hover {
+  border-color: var(--color-line-2);
+  background-color: var(--color-card-2);
+}
+
+/* Lifts a card slightly on hover — used on the interactive ones. */
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.7);
+}
+
+/* ── Monochrome stack logos ────────────────────────────────────
+   Stack tiles share one uniform background, so single-ink logos would
+   disappear on one theme. Flipping them keeps every tile identical while
+   staying brand-accurate — these marks ship in both polarities anyway.
+   ───────────────────────────────────────────────────────────── */
+
+/* White marks (OpenAI, Cursor, Copilot, Codex): flip on the light theme. */
+:root[data-theme="light"] .logo-on-dark {
+  filter: invert(1);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .logo-on-dark {
+    filter: invert(1);
+  }
+}
+
+/* Black marks (GitHub): flip on the dark theme. */
+:root[data-theme="dark"] .logo-on-light {
+  filter: invert(1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .logo-on-light {
+    filter: invert(1);
+  }
+}
+
+/* Dark multi-colour marks (Pandas): brighten on dark rather than invert,
+   which would turn its navy/yellow/magenta into the wrong hues entirely. */
+:root[data-theme="dark"] .logo-lift {
+  filter: brightness(2.6) saturate(1.15);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .logo-lift {
+    filter: brightness(2.6) saturate(1.15);
+  }
+}
+
+/* ── Activity heatmap ramp ─────────────────────────────────────
+   Five discrete steps rather than opacity of one hue: mixing a single
+   colour toward transparent left level 1 almost invisible against the
+   card. These are GitHub's own calendar greens, which read clearly on
+   both grounds. Level 0 is deliberately well above the card colour so
+   the empty grid is still visible.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --hm-0: #21262d;
+  --hm-1: #0e4429;
+  --hm-2: #006d32;
+  --hm-3: #26a641;
+  --hm-4: #39d353;
+}
+
+:root[data-theme="light"] {
+  --hm-0: #ebedf0;
+  --hm-1: #9be9a8;
+  --hm-2: #40c463;
+  --hm-3: #30a14e;
+  --hm-4: #216e39;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --hm-0: #ebedf0;
+    --hm-1: #9be9a8;
+    --hm-2: #40c463;
+    --hm-3: #30a14e;
+    --hm-4: #216e39;
+  }
+}
+
+/* Brand-tinted square used for stack items and company logos. The brand
+   colour arrives as --tile; everything else is derived from it so a single
+   value stays legible on both grounds. */
+.tile {
+  /* Dark ground: lift the mark toward white so deep brand colours
+     (Excel green, MySQL teal, Python blue) don't sink into the tile. */
+  color: color-mix(in oklab, var(--tile) 68%, #ffffff);
+  background-color: color-mix(in oklab, var(--tile) 13%, transparent);
+  border-color: color-mix(in oklab, var(--tile) 38%, transparent);
+}
+
+/* Pale brand colours (Cursor's near-white, the JS/Power BI yellows) vanish on
+   a light ground, so darken the mark toward ink there. */
+:root[data-theme="light"] .tile {
+  color: color-mix(in oklab, var(--tile) 42%, #0f0f14);
+  background-color: color-mix(in oklab, var(--tile) 18%, transparent);
+  border-color: color-mix(in oklab, var(--tile) 45%, transparent);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .tile {
+    color: color-mix(in oklab, var(--tile) 42%, #0f0f14);
+    background-color: color-mix(in oklab, var(--tile) 18%, transparent);
+    border-color: color-mix(in oklab, var(--tile) 45%, transparent);
+  }
+}
+
+/* Shared horizontal padding for every section inside the panel. Grows with the
+   viewport so a near-full-width panel stays comfortable rather than cramped. */
+.gutter {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+@media (min-width: 640px) {
+  .gutter {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+@media (min-width: 1024px) {
+  .gutter {
+    padding-left: 2.75rem;
+    padding-right: 2.75rem;
+  }
+}
+@media (min-width: 1280px) {
+  .gutter {
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+  }
+}
+@media (min-width: 1536px) {
+  .gutter {
+    padding-left: 4.5rem;
+    padding-right: 4.5rem;
+  }
+}
+
+/* Diagonal hatch behind the section title bands. */
+.stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-stripe) 0px,
+    var(--color-stripe) 1px,
+    transparent 1px,
+    transparent 7px
+  );
+}
+
+/* Fine grid behind the hero. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+.mask-fade {
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, #000 25%, transparent 100%);
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, #000 25%, transparent 100%);
+}
+
+/* ── Motion ────────────────────────────────────────────────────── */
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50%      { opacity: 1;    transform: scale(1.15); }
+}
+.twinkle {
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.float-y {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+/* Sweeping highlight used on the flagship project artwork. */
+@keyframes sheen {
+  0%   { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(320%)  skewX(-18deg); }
+}
+.group:hover .sheen {
+  animation: sheen 1100ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

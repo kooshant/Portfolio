@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# saved web pages dropped into public/ while debugging
+/public/Fix Dependency Conflict.html
+/public/Fix Dependency Conflict_files/

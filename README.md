@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kooshant Kumar — Portfolio
 
-## Getting Started
+Personal portfolio site — single page, dark theme.
 
-First, run the development server:
+Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · Framer Motion
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Also: `npm run build`, `npm start`, `npm run lint`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Editing the content
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All site content lives in [`data/profile.ts`](data/profile.ts). No component
+needs to be touched for a content change.
 
-## Learn More
+| To change                          | Edit                     |
+| ---------------------------------- | ------------------------ |
+| Name, role, email, links, timezone | `profile`                |
+| Badge, tagline, statement, buttons | `hero`                   |
+| About paragraphs, education        | `about`                  |
+| Jobs                               | `experience`             |
+| Projects                           | `projects`               |
+| Stack tiles and filter groups      | `skills` / `skillGroups` |
+| Certifications                     | `certifications`         |
+| GitHub / LeetCode usernames        | `codingProfiles`         |
+| Closing pitch                      | `contact`                |
+| Dock items                         | `sections`               |
 
-To learn more about Next.js, take a look at the following resources:
+Adding a job or project means adding one object to an array.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Adding a project
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```ts
+{
+  title: "Project name",
+  blurb: "One or two sentences.",
+  points: ["Bullet.", "Bullet."],
+  tags: ["Python", "SQL"],
+  href: "https://example.com",       // optional — adds the "View project" button
+  status: "Shipped",
+  image: "/screenshot.png",          // optional — file in public/
+  gradient: ["#34d399", "#0ea5e9"],  // artwork colours when there is no image
+}
+```
 
-## Deploy on Vercel
+`imageFit` controls how a screenshot sits in the card:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **`"cover"`** (default) — website screenshots. Fills the panel, cropped from the top.
+- **`"contain"`** — dashboards and diagrams, where cropping would lose meaning.
+  Add `imageAspect: width / height` from the file's real dimensions, and
+  `imageAlt` describing what it shows.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Coding Activity
+
+GitHub and LeetCode stats are fetched server-side from public endpoints — no API
+keys needed. Usernames are set in `codingProfiles`.
+
+Numbers are cached for an hour, and Next's fetch cache survives rebuilds. To
+force fresh data locally:
+
+```bash
+rm -rf .next/cache && npm run build && npm start
+```
+
+On Vercel, redeploy with "use existing build cache" unchecked.
+
+## Structure
+
+```
+app/          layout (fonts, SEO, theme), page, global styles
+components/   one file per section, plus coding/ for the stats cards
+lib/coding/   GitHub + LeetCode fetching
+data/         profile.ts — all site content
+public/       photo, resume PDF, project screenshots, logos, icons
+```
+
+## Deploy
+
+1. Push to GitHub.
+2. Import at [vercel.com/new](https://vercel.com/new) and deploy — no config needed.
+3. Set `NEXT_PUBLIC_SITE_URL` to the deployed URL so link previews resolve.
