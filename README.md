@@ -1,11 +1,6 @@
 # Portfolio
 
-Personal portfolio for Kooshant Kumar, a Computer Science undergraduate working
-across data engineering, AI and software. A single-page site whose Coding
-Activity section reports real GitHub and LeetCode figures, fetched server-side
-and cached, with no API keys and no backend of its own.
-
-Live: [kooshant-portfolio.vercel.app](https://kooshant-portfolio.vercel.app)
+Personal portfolio 
 
 ## What's in it
 
